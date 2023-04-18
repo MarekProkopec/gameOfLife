@@ -64,25 +64,32 @@
     </div>
   </main>
   <aside>
-    <p>Spawn on: <br />x:{{ lastSelected[0] }}, y:{{ lastSelected[1] }}</p>
-    <h3>Templates:</h3>
-    <div class="templates">
-      <div
-        class="template"
-        v-for="(item, index) in templates"
-        :key="index"
-        @click="spawnTemplate(index)"
-      >
-        <div class="info">
-          <h3 class="name">{{ item["name"] }}</h3>
-          <h5 class="type">{{ item["type"] }}</h5>
+    <div class="score">
+      <h2>
+        Score: <span>{{ score }}</span>
+      </h2>
+    </div>
+    <div class="spawn">
+      <p>Spawn on: <br />x:{{ lastSelected[0] }}, y:{{ lastSelected[1] }}</p>
+      <h3>Templates:</h3>
+      <div class="templates">
+        <div
+          class="template"
+          v-for="(item, index) in templates"
+          :key="index"
+          @click="spawnTemplate(index)"
+        >
+          <div class="info">
+            <h3 class="name">{{ item["name"] }}</h3>
+            <h5 class="type">{{ item["type"] }}</h5>
+          </div>
+          <canvas
+            :ref="setItemRef"
+            :draw="draw(index)"
+            :height="item['template'].length * canvasRes"
+            :width="getWidth(item['template']) * canvasRes"
+          ></canvas>
         </div>
-        <canvas
-          :ref="setItemRef"
-          :draw="draw(index)"
-          :height="item['template'].length * canvasRes"
-          :width="getWidth(item['template']) * canvasRes"
-        ></canvas>
       </div>
     </div>
   </aside>
@@ -91,7 +98,6 @@
 <script>
 import Panzoom from "@panzoom/panzoom";
 import { templates } from "./js/templates.js";
-
 
 export default {
   name: "App",
@@ -305,6 +311,15 @@ export default {
       animate: true,
     });
   },
+  computed: {
+    score() {
+      let ans = 0;
+      for (let row of this.grid) {
+        ans += row.filter((e) => !!e).length;
+      }
+      return ans;
+    },
+  },
 };
 </script>
 
@@ -407,66 +422,96 @@ html,
   }
 
   aside {
-    height: 70%;
-    box-shadow: black 0px 0px 0 4px;
     width: 20%;
-    border-radius: 15px;
+    height: 80%;
 
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    padding: 5px;
-
-    & > h3 {
-      border-bottom: solid 2px rgba(0, 0, 0, 0.2);
-      padding-bottom: 5px;
-      margin-bottom: 10px;
+    .score {
+      margin-bottom: 5%;
+      span {
+        font-weight: bolder;
+      }
     }
 
-    .templates {
-      .template {
-        height: 150px;
-        width: 100%;
-        border: solid 2px black;
-        border-radius: 10px;
-        padding: 5px;
-        margin: 5px 0;
-        transition: 0.1s linear box-shadow;
-        cursor: pointer;
+    .spawn {
+      height: 100%;
+      box-shadow: black 0px 0px 0 4px;
+      width: 100%;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 5px;
 
-        display: grid;
-        grid-template-columns: max-content auto;
-        gap: 10px;
-        overflow: auto;
+      & > h3 {
+        border-bottom: solid 2px rgba(0, 0, 0, 0.2);
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+      }
 
-        &:hover {
-          box-shadow: 0 0 0 2px black;
-        }
-        .info {
-          align-self: flex-start;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          justify-content: center;
+      .templates {
+        .template {
+          height: 150px;
+          width: 100%;
+          border: solid 2px black;
+          border-radius: 10px;
+          padding: 5px;
+          margin: 5px 0;
+          transition: 0.1s linear box-shadow;
+          cursor: pointer;
 
-          h3 {
-            overflow-wrap: break-word;
-            max-width: min-content;
+          display: grid;
+          grid-template-columns: max-content auto;
+          gap: 10px;
+          overflow: auto;
+
+          &:hover {
+            box-shadow: 0 0 0 2px black;
+          }
+          .info {
+            align-self: flex-start;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+
+            h3 {
+              overflow-wrap: break-word;
+              max-width: min-content;
+            }
+
+            h5 {
+              color: rgba(0, 0, 0, 0.8);
+              font-weight: normal;
+            }
           }
 
-          h5 {
-            color: rgba(0, 0, 0, 0.8);
-            font-weight: normal;
+          canvas {
+            border: solid 2px rgba(0, 0, 0, 0.404);
+            max-width: max-content;
+            max-height: max-content;
+            height: 100%;
+            justify-self: flex-end;
           }
         }
+      }
+    }
+  }
+}
 
-        canvas {
-          border: solid 2px rgba(0, 0, 0, 0.404);
-          max-width: max-content;
-          max-height: max-content;
-          height: 100%;
-          justify-self: flex-end;
-        }
+@media (max-width: 900px) {
+  #app {
+    flex-direction: column;
+    overflow-y: auto;
+    justify-content: start;
+    padding-top: 3vh;
+
+    aside{
+      margin-top: 5vh;
+
+      width:80%;
+
+      .spawn{
+        overflow: visible;
       }
     }
   }
