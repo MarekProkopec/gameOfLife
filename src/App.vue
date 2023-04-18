@@ -315,7 +315,7 @@ export default {
     score() {
       let ans = 0;
       for (let row of this.grid) {
-        ans += row.filter((e) => !!e).length;
+        for (let item of row) if (item) ans++;
       }
       return ans;
     },
@@ -505,12 +505,12 @@ html,
     justify-content: start;
     padding-top: 3vh;
 
-    aside{
+    aside {
       margin-top: 5vh;
 
-      width:80%;
+      width: 80%;
 
-      .spawn{
+      .spawn {
         overflow: visible;
       }
     }
